@@ -20,7 +20,7 @@ import Product from "./db/Product.js";
 // const clientSecret = process.env.CLIENTSECRET;
 const jwtKey = process.env.JWTKEY;
 
-const port = 5000;
+const port = process.env.PORT || 4000;
 const app = express();
 
 // use the client app
@@ -240,4 +240,9 @@ function verifyToken(req, res, next) {
   }
 }
 
-app.listen(port);
+app.listen(port, (err) => {
+  if (err) {
+    console.log("Error in server setup!");
+  }
+  console.log(`Server is listening on port ${port}`);
+});
