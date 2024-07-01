@@ -2,29 +2,15 @@ import "dotenv/config.js";
 import express from "express";
 import cors from "cors";
 import JWT from "jsonwebtoken";
-// import session from "express-session";
-// import passport from "passport";
-// import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-// import path from "path";
-// import { fileURLToPath } from "url";
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
 
 import("./db/config.js");
 import User from "./db/User.js";
-// import GoogleUser from "./db/googleUser.js";
 import Product from "./db/Product.js";
 
-// const clientId = process.env.CLIENTID;
-// const clientSecret = process.env.CLIENTSECRET;
 const jwtKey = process.env.JWTKEY;
 
 const port = process.env.PORT || 4000;
 const app = express();
-
-// use the client app
-// app.use(express.static(path.join(__dirname, "client/dist")));
 
 app.use(express.json());
 app.use(
@@ -35,84 +21,12 @@ app.use(
   })
 );
 
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(__dirname, "client/dist/index.html"));
-// });
-
-// Setup Session
-// app.use(
-//   session({
-//     secret: "Everything is coded",
-//     resave: false,
-//     saveUninitialized: true,
-//   })
-// );
-
-// Setup passport
-// app.use(passport.initialize());
-// app.use(passport.session());
-
-// passport.use(
-//   new GoogleStrategy(
-//     {
-//       clientID: clientId,
-//       clientSecret: clientSecret,
-//       callbackURL: "/auth/google/callback",
-//       scope: ["profile", "email"],
-//     },
-//     async (accessToken, refreshToken, profile, done) => {
-//       console.log("profile", profile);
-//       try {
-//         let user = await GoogleUser.findOne({ googleId: profile.id });
-
-//         if (!user) {
-//           user = new GoogleUser({
-//             googleId: profile.id,
-//             displayName: profile.displayName,
-//             email: profile.emails[0].value,
-//             image: profile.emails[0].value,
-//           });
-//           await user.save();
-//         }
-
-//         return done(null, user);
-//       } catch (error) {
-//         return done(error, null);
-//       }
-//     }
-//   )
-// );
-
-// passport.serializeUser((user, done) => {
-//   done(null, user);
-// });
-
-// passport.deserializeUser((user, done) => {
-//   done(null, user);
-// });
-
-// Initial google oauth login
-// app.get(
-//   "/auth/google",
-//   passport.authenticate("google", { scope: ["profile", "email"] })
-// );
-
-// app.get(
-//   "/auth/google/callback",
-//   passport.authenticate("google", {
-//     successRedirect: "http://localhost:5173/",
-//     failureRedirect: "http://localhost:5173/login",
-//   })
-// );
-
 app.post("/register", async (req, res) => {
   try {
     const { name, email, password, confirmPassword } = req.body;
     let registeredUser = await User.findOne({ email });
     console.log("registeredUser", registeredUser);
     if (registeredUser) {
-      // res.status(400).send({ result: "Email already registered!" });
-      // throw new error({ message: "Email already registered!" });
       res.send({ result: "Email already registered!" });
     } else {
       let user = new User(req.body);
@@ -138,7 +52,6 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   console.log(req.body);
-  // if (req.body.email && req.body.password) {
   let user = await User.findOne(req.body).select("-password");
   if (user) {
     JWT.sign({ user }, jwtKey, { expiresIn: "2h" }, (err, token) => {
